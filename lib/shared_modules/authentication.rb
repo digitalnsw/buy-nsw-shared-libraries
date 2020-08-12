@@ -125,7 +125,7 @@ module SharedModules
 
       update_concurrent_session({user: h})
 
-      @session_user = SharedModules::SessionUser.new(h)
+      @session_user = SharedModules::SessionUser.new(concurrent_session[:user])
     end
 
     def session_user
@@ -136,18 +136,15 @@ module SharedModules
         end
       end
 
-      # FIXME The following line is added to fix a bug
-      # sometimes the session is outdated. Most probably because race condition.
-      # happens more often when sign-in as another user, as it sends multi queries
-      # to server and can cause race condition for auth query.
-      # another reason could be when user is inactive for half an hour and then
-      # takes an action without refreshing the page, if they had ticket remember-me,
-      # they stay logged in but session is outdated.
+      # FIXME The following is added to fix a bug and report every time it heppenes.
+      # it happens more often when admin impersonates, as it doesnt reset_session_user
+      # by adding the concurrent session, other cases shouldn't happen any more
+      # remove this when the Airbrake erorr is gone
 
       if current_user&.id != @session_user&.id
         reset_session_user(current_user)
         if Rails.env.production?
-          Airbrake.notify_sync StandardError.new('Session user is our of sync again!')
+          Airbrake.notify_sync StandardError.new('Session user is out of sync again!')
         end
       end
 
