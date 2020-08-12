@@ -12,9 +12,9 @@ module SharedModules
 
   module Authentication
     extend ActiveSupport::Concern
+    include SharedModules::Session
     include ActionController::RequestForgeryProtection
     include ERB::Util
-
 
     included do
       before_action :set_headers
@@ -100,57 +100,6 @@ module SharedModules
       }, status: 500
     end
 
-    def update_session_user attrs
-      update_concurrent_session({user: attrs})
-
-      @session_user = SharedModules::SessionUser.new(h)
-    end
-
-    def reset_session_user user
-      my_buyer = user.is_buyer? &&
-        SharedResources::RemoteBuyer.my_buyer(user) || nil
-      my_seller = user.seller_id &&
-        SharedResources::RemoteSeller.find(user.seller_id) || nil
-
-      h = {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        seller_id: user.seller_id,
-        roles: user.roles.to_a,
-        buyer_id: my_buyer&.id,
-        seller_status: my_seller&.status,
-        buyer_status: my_buyer&.state,
-      }
-
-      update_concurrent_session({user: h})
-
-      @session_user = SharedModules::SessionUser.new(concurrent_session[:user])
-    end
-
-    def session_user
-      if @session_user.nil?
-        h = concurrent_session[:user]
-        if h.present?
-          @session_user = SharedModules::SessionUser.new(h)
-        end
-      end
-
-      # FIXME The following is added to fix a bug and report every time it heppenes.
-      # it happens more often when admin impersonates, as it doesnt reset_session_user
-      # by adding the concurrent session, other cases shouldn't happen any more
-      # remove this when the Airbrake erorr is gone
-
-      if current_user&.id != @session_user&.id
-        reset_session_user(current_user)
-        if Rails.env.production?
-          Airbrake.notify_sync StandardError.new('Session user is out of sync again!')
-        end
-      end
-
-      @session_user
-    end
-
     def service_auth?
       @service_auth.present?
     end
@@ -207,43 +156,6 @@ module SharedModules
     def authenticate_user
       return if current_user.present?
       render_authentication_failed
-    end
-
-    def redis
-      Rails.cache.redis
-    end
-
-    def session_timeout
-      2.weeks.to_i
-    end
-
-    def session_key
-      'CONCURRENT_SESSION_' + session.id.to_s
-    end
-
-    def concurrent_session
-      @concurrent_session ||= get_concurrent_session
-    end
-
-    def update_concurrent_session h
-      return unless session.id.present?
-      @concurrent_session = get_concurrent_session.deep_merge(h)
-      redis.set session_key, @concurrent_session.to_json
-      redis.expire session_key, session_timeout
-    end
-
-    private
-
-    def get_concurrent_session
-      return {} unless session.id.present?
-      redis.expire session_key, session_timeout
-      redis.get(session_key).yield_self do |v|
-        if v
-          JSON.parse v, symbolize_names: true
-        else
-          {}
-        end
-      end
     end
   end
 end
