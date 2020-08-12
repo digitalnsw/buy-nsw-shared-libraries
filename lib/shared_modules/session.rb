@@ -38,8 +38,7 @@ module SharedModules
       end
 
       # FIXME The following is added to fix a bug and report every time it heppenes.
-      # it happens more often when admin impersonates, as it doesn't reset_session_user
-      # by adding the concurrent session, other cases shouldn't happen any more!
+      # by adding the concurrent session, this shouldn't happen any more!
       # remove this check when the Airbrake erorr is gone
       if current_user&.id != @session_user&.id
         reset_session_user(current_user)
@@ -49,18 +48,6 @@ module SharedModules
       end
 
       @session_user
-    end
-
-    def redis
-      Rails.cache.redis
-    end
-
-    def session_timeout
-      2.weeks.to_i
-    end
-
-    def session_key
-      'CONCURRENT_SESSION_' + session.id.to_s
     end
 
     def concurrent_session
@@ -75,6 +62,18 @@ module SharedModules
     end
 
     private
+
+    def redis
+      Rails.cache.redis
+    end
+
+    def session_timeout
+      2.weeks.to_i
+    end
+
+    def session_key
+      'CONCURRENT_SESSION_' + session.id.to_s
+    end
 
     def get_concurrent_session
       return {} unless session.id.present?
