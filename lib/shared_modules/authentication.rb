@@ -228,6 +228,15 @@ module SharedModules
       @concurrent_session ||= get_concurrent_session
     end
 
+    def update_concurrent_session h
+      return unless session.id.present?
+      @concurrent_session = get_concurrent_session.deep_merge(h)
+      redis.set session_key, @concurrent_session.to_json
+      redis.expire session_key, session_timeout
+    end
+
+    private:
+
     def get_concurrent_session
       return {} unless session.id.present?
       redis.expire session_key, session_timeout
@@ -237,13 +246,6 @@ module SharedModules
       else
         {}
       end
-    end
-
-    def update_concurrent_session h
-      return unless session.id.present?
-      h = get_concurrent_session.deep_merge(h)
-      redis.set session_key, h.to_json
-      redis.expire session_key, session_timeout
     end
   end
 end
