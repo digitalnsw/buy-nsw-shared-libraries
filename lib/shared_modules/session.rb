@@ -3,7 +3,7 @@ require "json"
 module SharedModules
   module Session
     def update_session_user attrs
-      update_concurrent_session({user: attrs})
+      update_c_session({user: attrs})
       @session_user = SharedModules::SessionUser.new(user_hash)
     end
 
@@ -24,14 +24,14 @@ module SharedModules
         buyer_status: my_buyer&.state,
       }
 
-      update_concurrent_session({user: user_hash})
+      update_c_session({user: user_hash})
 
       @session_user = SharedModules::SessionUser.new(user_hash)
     end
 
     def session_user
       if @session_user.nil?
-        user_hash = concurrent_session[:user]
+        user_hash = c_session[:user]
         if user_hash.present?
           @session_user = SharedModules::SessionUser.new(user_hash)
         end
@@ -50,15 +50,19 @@ module SharedModules
       @session_user
     end
 
-    def concurrent_session
-      @concurrent_session ||= get_concurrent_session
+    def c_session
+      @c_session ||= get_c_session
     end
 
-    def update_concurrent_session update_hash
+    def update_c_session update_hash
       return unless session.id.present?
-      @concurrent_session = get_concurrent_session.deep_merge(update_hash)
-      redis.set session_key, @concurrent_session.to_json
+      @c_session = get_c_session.deep_merge(update_hash)
+      redis.set session_key, @c_session.to_json
       redis.expire session_key, session_timeout
+    end
+
+    def reset_c_session
+      redis.del session_key if session.id.present?
     end
 
     private
@@ -72,10 +76,10 @@ module SharedModules
     end
 
     def session_key
-      'CONCURRENT_SESSION_' + session.id.to_s
+      'C_SESSION_' + session.id.to_s
     end
 
-    def get_concurrent_session
+    def get_c_session
       return {} unless session.id.present?
       redis.expire session_key, session_timeout
       redis.get(session_key).yield_self do |value|
