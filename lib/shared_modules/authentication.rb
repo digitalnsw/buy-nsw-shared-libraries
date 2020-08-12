@@ -100,15 +100,13 @@ module SharedModules
       }, status: 500
     end
 
-    def update_session_attributes attrs
-      h = session_user.to_hash.merge attrs
-
-      session[:user] = h
+    def update_session_user attrs
+      update_concurrent_session({user: attrs})
 
       @session_user = SharedModules::SessionUser.new(h)
     end
 
-    def update_session_user user
+    def reset_session_user user
       my_buyer = user.is_buyer? &&
         SharedResources::RemoteBuyer.my_buyer(user) || nil
       my_seller = user.seller_id &&
@@ -125,18 +123,34 @@ module SharedModules
         buyer_status: my_buyer&.state,
       }
 
-      session[:user] = h
+      update_concurrent_session({user: h})
 
       @session_user = SharedModules::SessionUser.new(h)
     end
 
     def session_user
       if @session_user.nil?
-        h = session[:user]
+        h = concurrent_session[:user]
         if h.present?
           @session_user = SharedModules::SessionUser.new(h)
         end
       end
+
+      # FIXME The following line is added to fix a bug
+      # sometimes the session is outdated. Most probably because race condition.
+      # happens more often when sign-in as another user, as it sends multi queries
+      # to server and can cause race condition for auth query.
+      # another reason could be when user is inactive for half an hour and then
+      # takes an action without refreshing the page, if they had ticket remember-me,
+      # they stay logged in but session is outdated.
+
+      if current_user&.id != @session_user&.id
+        reset_session_user(current_user)
+        if Rails.env.production?
+          Airbrake.notify_sync StandardError.new('Session user is our of sync again!')
+        end
+      end
+
       @session_user
     end
 
@@ -196,6 +210,34 @@ module SharedModules
     def authenticate_user
       return if current_user.present?
       render_authentication_failed
+    end
+
+    def redis
+      Rails.cache.redis
+    end
+
+    def session_timeout
+      2.weeks.to_i
+    end
+
+    def session_key
+      'CONCURRENT_SESSION_' + session.id.to_s if session.id.present?
+    end
+
+    def concurrent_session
+      @concurrent_session ||= get_concurrent_session
+    end
+
+    def get_concurrent_session
+      return nil if session.id.nil?
+      redis.expire session_key, session_timeout
+      JSON.parse redis.get(session_key), symbolize_names: true
+    end
+
+    def update_concurrent_session h
+      h = get_concurrent_session.deep_merge(h)
+      redis.set session_key, h.to_json
+      redis.expire session_key, session_timeout
     end
   end
 end
