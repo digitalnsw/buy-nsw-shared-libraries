@@ -57,8 +57,7 @@ module SharedModules
     def update_c_session update_hash
       return unless session.id.present?
       @c_session = get_c_session.deep_merge(update_hash)
-      redis.set session_key, @c_session.to_json
-      redis.expire session_key, session_timeout
+      set_c_session @c_session
     end
 
     def reset_c_session
@@ -79,11 +78,16 @@ module SharedModules
       'C_SESSION_' + session.id.to_s
     end
 
+    def set_c_session session_hash
+      redis.set session_key, session_hash.to_json
+      redis.expire session_key, session_timeout
+    end
+
     def get_c_session
       return {} unless session.id.present?
       redis.expire session_key, session_timeout
       redis.get(session_key).yield_self do |value|
-        if value
+        if value.present?
           JSON.parse value, symbolize_names: true
         else
           {}
