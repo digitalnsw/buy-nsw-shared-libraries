@@ -221,7 +221,7 @@ module SharedModules
     end
 
     def session_key
-      'CONCURRENT_SESSION_' + session.id.to_s if session.id.present?
+      'CONCURRENT_SESSION_' + session.id.to_s
     end
 
     def concurrent_session
@@ -240,11 +240,12 @@ module SharedModules
     def get_concurrent_session
       return {} unless session.id.present?
       redis.expire session_key, session_timeout
-      v = redis.get(session_key)
-      if v
-        JSON.parse v, symbolize_names: true
-      else
-        {}
+      redis.get(session_key).yield_self do |v|
+        if v
+          JSON.parse v, symbolize_names: true
+        else
+          {}
+        end
       end
     end
   end
