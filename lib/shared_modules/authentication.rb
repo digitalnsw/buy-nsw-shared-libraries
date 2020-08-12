@@ -229,7 +229,7 @@ module SharedModules
     end
 
     def get_concurrent_session
-      return nil if session.id.nil?
+      return {} if session.id.nil?
       redis.expire session_key, session_timeout
       JSON.parse redis.get(session_key), symbolize_names: true
     end
