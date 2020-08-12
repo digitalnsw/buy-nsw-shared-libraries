@@ -235,7 +235,7 @@ module SharedModules
       redis.expire session_key, session_timeout
     end
 
-    private:
+    private
 
     def get_concurrent_session
       return {} unless session.id.present?
