@@ -41,10 +41,23 @@ module SharedModules
       # by adding the concurrent session, this shouldn't happen any more!
       # remove this check when the Airbrake erorr is gone
       if current_user&.id != @session_user&.id
-        reset_session_user(current_user)
         if Rails.env.production?
-          Airbrake.notify_sync StandardError.new('Session user is out of sync again!')
+          begin
+            raise nil
+          rescue => e
+            trace = e.backtrace[1..5]
+          end
+          Airbrake.notify_sync(
+            "Session user is out of sync",
+            {
+              current_user_id: current_user&.id,
+              session_user_id: @session_user&.id,
+              request_path: request.path,
+              trace: trace
+            }
+          )
         end
+        reset_session_user(current_user)
       end
 
       @session_user
