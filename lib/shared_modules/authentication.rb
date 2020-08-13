@@ -42,19 +42,19 @@ module SharedModules
 
     def render_authentication_failed
       render json: {
-        errors: ['Authentication failed, please refresh!']
+        errors: ['Authentication failed!']
       }, status: :unauthorized #401
     end
 
     def render_unauthorized
       render json: {
-        errors: ['Authorization failed, please refresh!']
+        errors: ['Authorization failed!']
       }, status: :unauthorized #401
     end
 
     def access_forbidden
       render json: {
-        errors: ['Access to this page or api is forbidden!']
+        errors: ['Access to this resource is forbidden!']
       }, status: 403
     end
 
