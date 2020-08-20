@@ -4,7 +4,7 @@ module SharedModules
   module Session
     def update_session_user attrs
       update_c_session({user: attrs})
-      @session_user = SharedModules::SessionUser.new(attrs)
+      @session_user = SharedModules::SessionUser.new(c_session[:user])
     end
 
     def reset_session_user user
