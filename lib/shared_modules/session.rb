@@ -8,6 +8,7 @@ module SharedModules
     end
 
     def reset_session_user user
+      return @session_user = nil unless user.present?
       my_buyer = user.is_buyer? &&
         SharedResources::RemoteBuyer.my_buyer(user) || nil
       my_seller = user.seller_id &&
