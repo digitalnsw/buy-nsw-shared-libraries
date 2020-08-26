@@ -1,7 +1,32 @@
 require "json"
+require 'openssl'
+require 'base64'
 
 module SharedModules
   module Session
+    def bin2hex(data)
+      data.unpack('C*').map{ |b| "%02X" % b }.join('')
+    end
+
+    def blowfish(data)
+      cipher = OpenSSL::Cipher.new('bf-ecb').encrypt
+      cipher.key = Base64.decode64(ENV['ETENDERING_ENCRYPTION_KEY'])
+      cipher.update(data) << cipher.final
+    end
+
+    def sync_sso
+      cookie = ENV['SSO_SYNC_COOKIE']
+      if cookie.present?
+        data = session_user.present? ? { email: session_user.email, name: session_user.full_name } : {}
+        enc = bin2hex(blowfish(data.to_json))
+        cookies[cookie] = {
+          value: enc,
+          expires: 2.weeks.from_now,
+          domain: '.nsw.gov.au'
+        }
+      end
+    end
+
     def update_session_user attrs
       update_c_session({user: attrs})
       @session_user = SharedModules::SessionUser.new(c_session[:user])
@@ -17,6 +42,7 @@ module SharedModules
       user_hash = {
         id: user.id,
         email: user.email,
+        uuid: user.uuid,
         full_name: user.full_name,
         seller_id: user.seller_id,
         roles: user.roles.to_a,

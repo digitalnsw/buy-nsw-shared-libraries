@@ -2,12 +2,13 @@ require "json"
 
 module SharedModules
   class SessionUser
-    attr_reader :id, :email, :full_name, :seller_id, :buyer_id, :roles, :seller_status, :buyer_status
+    attr_reader :id, :uuid, :email, :full_name, :seller_id, :buyer_id, :roles, :seller_status, :buyer_status
 
     def initialize hash
       hash.transform_keys!(&:to_sym)
       @id = hash[:id]
       @email = hash[:email]
+      @uuid = hash[:uuid]
       @full_name = hash[:full_name]
       @seller_id = hash[:seller_id]
       @buyer_id = hash[:buyer_id]
@@ -17,7 +18,7 @@ module SharedModules
     end
 
     def to_hash
-      [:id, :email, :full_name, :seller_id, :buyer_id, :roles, :seller_status, :buyer_status].map { |k|
+      [:id, :uuid, :email, :full_name, :seller_id, :buyer_id, :roles, :seller_status, :buyer_status].map { |k|
         [k, send(k)]
       }.to_h
     end

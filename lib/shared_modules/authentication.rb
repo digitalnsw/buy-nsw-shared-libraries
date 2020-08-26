@@ -18,6 +18,7 @@ module SharedModules
 
     included do
       before_action :set_headers
+      before_action :sync_sso
       protect_from_forgery with: :exception unless Rails.env.test?
       impersonates :user
 
