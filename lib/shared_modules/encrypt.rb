@@ -6,7 +6,7 @@ module SharedModules
   module Encrypt
     def encrypt_and_sign data
       private_key = OpenSSL::PKey::RSA.new File.read(Rails.root.join('sso_rsa.pem').to_s)
-      jwt_token = JWT.encode(data, private_key, 'RS512')
+      jwt_token = JWT.encode(data, private_key, 'RS512', { typ: 'JWT'})
       bin2hex(blowfish(jwt_token))
     end
 

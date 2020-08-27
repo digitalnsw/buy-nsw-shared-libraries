@@ -1,4 +1,4 @@
-require "json"
+require 'json'
 require 'openssl'
 require 'base64'
 
@@ -9,7 +9,7 @@ module SharedModules
     include ActionController::Cookies
 
     included do
-      before_action :sync_sso
+      after_action :sync_sso
 
       def sync_sso
         ck = ENV['SSO_SYNC_COOKIE']
@@ -19,7 +19,7 @@ module SharedModules
           cookies[ck] = {
             value: enc,
             expires: 2.weeks.from_now,
-            domain: '.nsw.gov.au',
+            domain: ['.buy.nsw.gov.au', URI(ENV['ETENDERING_URL']).host],
             secure: true
           }
         end
