@@ -19,7 +19,7 @@ module SharedModules
           cookies[ck] = {
             value: enc,
             expires: 2.weeks.from_now,
-            domain: ['.buy.nsw.gov.au', URI(ENV['ETENDERING_URL']).host],
+            domain: '.nsw.gov.au',
             secure: true
           }
         end
