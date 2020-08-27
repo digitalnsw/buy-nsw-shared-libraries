@@ -23,6 +23,13 @@ module SharedModules
             secure: true
           }
         end
+      rescue => e
+        if Rails.env.production?
+          Airbrake.notify_sync e
+        else
+          puts e.message
+          puts e.backtrace
+        end
       end
 
       def update_session_user attrs
