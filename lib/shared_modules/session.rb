@@ -65,7 +65,10 @@ module SharedModules
         # FIXME The following is added to fix a bug and report every time it heppenes.
         # by adding the concurrent session, this shouldn't happen any more!
         # remove this check when the Airbrake erorr is gone
-        if current_user&.id != @session_user&.id
+        if current_user&.id != @session_user&.id ||
+           current_user&.uuid != @session_user&.uuid ||
+           current_user&.email != @session_user&.email ||
+           current_user&.seller_id != @session_user&.seller_id
           if Rails.env.production?
             begin
               raise nil
