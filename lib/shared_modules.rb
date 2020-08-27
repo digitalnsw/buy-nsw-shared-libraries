@@ -1,4 +1,5 @@
 module SharedModules
+  require 'shared_modules/encrypt'
   require 'shared_modules/session'
   require 'shared_modules/authentication'
   require 'shared_modules/serializer'
