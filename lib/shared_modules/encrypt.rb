@@ -10,11 +10,15 @@ module SharedModules
       bin2hex(blowfish(jwt_token))
     end
 
-    def bin2hex(data)
+    def encrypt data
+      bin2hex(blowfish(data.to_json))
+    end
+
+    def bin2hex data
       data.unpack('C*').map{ |b| "%02X" % b }.join('')
     end
 
-    def blowfish(data)
+    def blowfish data
       cipher = OpenSSL::Cipher.new('bf-ecb').encrypt
       cipher.key = Base64.decode64(ENV['ETENDERING_ENCRYPTION_KEY'])
       cipher.update(data) << cipher.final

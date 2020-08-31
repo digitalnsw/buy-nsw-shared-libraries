@@ -15,7 +15,7 @@ module SharedModules
         ck = ENV['SSO_SYNC_COOKIE']
         if ck.present?
           data = session_user.present? ? { email: session_user.email, name: session_user.full_name } : {}
-          enc = encrypt_and_sign data
+          enc = encrypt data
           cookies[ck] = {
             value: enc,
             expires: 2.weeks.from_now,
