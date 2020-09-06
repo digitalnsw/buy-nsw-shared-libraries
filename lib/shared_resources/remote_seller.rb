@@ -12,8 +12,8 @@ module SharedResources
       find :all, params: {telco: true}
     end
 
-    def self.level_2_services(seller_id)
-      get "#{seller_id}/level_2_services"
+    def self.all_services(seller_id)
+      get "#{seller_id}/all_services"
     end
 
     def self.single_seller(seller_id)
