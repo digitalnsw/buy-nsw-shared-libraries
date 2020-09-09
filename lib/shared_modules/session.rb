@@ -14,7 +14,11 @@ module SharedModules
       def sync_sso
         ck = ENV['SSO_SYNC_COOKIE']
         if ck.present?
-          data = session_user.present? ? { email: session_user.email, name: session_user.full_name } : {}
+          data = session_user.present? ? {
+            id: session_user.id,
+            email: session_user.email,
+            name: session_user.full_name
+          } : {}
           enc = encrypt data
           cookies[ck] = {
             value: enc,
