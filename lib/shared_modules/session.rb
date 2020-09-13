@@ -83,7 +83,7 @@ module SharedModules
            current_user&.email != @session_user&.email ||
            current_user&.seller_id != @session_user&.seller_id ||
            current_user&.seller_ids != @session_user&.seller_ids ||
-           current_user&.permissions != @session_user&.permissions ||
+           current_user&.permissions != @session_user&.permissions
           if Rails.env.production?
             begin
               raise nil
