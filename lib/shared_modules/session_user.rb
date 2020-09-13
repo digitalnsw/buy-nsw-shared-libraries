@@ -34,11 +34,11 @@ module SharedModules
     end
 
     def can? seller_id, action
-      permissions[seller_id.to_s] && permissions[seller_id.to_s].include?(action.to_s)
+      permissions && permissions[seller_id.to_s] && permissions[seller_id.to_s].include?(action.to_s)
     end
 
     def privileges seller_id
-      permissions[seller_id.to_s]
+      permissions && permissions[seller_id.to_s]
     end
 
     def can_buy?
