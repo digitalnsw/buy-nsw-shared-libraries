@@ -54,7 +54,9 @@ module SharedModules
           uuid: user.uuid,
           full_name: user.full_name,
           seller_id: user.seller_id,
+          seller_ids: user.seller_ids,
           roles: user.roles.to_a,
+          permissions: user.permissions,
           buyer_id: my_buyer&.id,
           seller_status: my_seller&.status,
           buyer_status: my_buyer&.state,
@@ -79,7 +81,9 @@ module SharedModules
         if current_user&.id != @session_user&.id ||
            current_user&.uuid != @session_user&.uuid ||
            current_user&.email != @session_user&.email ||
-           current_user&.seller_id != @session_user&.seller_id
+           current_user&.seller_id != @session_user&.seller_id ||
+           current_user&.seller_ids != @session_user&.seller_ids ||
+           current_user&.permissions != @session_user&.permissions ||
           if Rails.env.production?
             begin
               raise nil
