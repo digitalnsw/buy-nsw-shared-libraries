@@ -10,8 +10,8 @@ module SharedResources
       nil
     end
 
-    def self.initiate_seller(id, owner_id)
-      r = post "#{id}/initiate_seller", { owner_id: owner_id }
+    def self.initiate_seller(id)
+      r = post "#{id}/initiate_seller"
       JSON.parse(r.body)['seller_id']
     end
   end
