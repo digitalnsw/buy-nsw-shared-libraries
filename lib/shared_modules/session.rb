@@ -88,7 +88,7 @@ module SharedModules
             begin
               raise nil
             rescue => e
-              trace = e.backtrace[1..5]
+              trace = e.backtrace.select{|l|l.match?(/buy-nsw/)}
             end
             Airbrake.notify_sync(
               "Session user is out of sync",
