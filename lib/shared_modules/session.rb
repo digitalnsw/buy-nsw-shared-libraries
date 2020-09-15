@@ -16,6 +16,7 @@ module SharedModules
         if ck.present?
           data = session_user.present? ? {
             id: session_user.id,
+            uuid: session_user.uuid,
             email: session_user.email,
             name: session_user.full_name
           } : {}
