@@ -8,16 +8,16 @@ module SharedResources
       post "#{user_id}/update_seller", { seller_id: seller_id }
     end
 
-    def self.get_owners(seller_id)
-      get :seller_owners, {seller_id: seller_id}
+    def self.get_team(seller_id)
+      find(:all, from: :seller_team, params: { seller_id: seller_id })
     end
 
     def self.get_by_id(user_id)
-      get(:get_by_id, { id: user_id }).first
+      find(:one, from: :get_by_id, params: { id: user_id })
     end
 
     def self.get_by_email(user_email)
-      get(:get_by_email, { email: user_email }).first
+      find(:one, from: :get_by_email, params: { email: user_email })
     end
 
     def self.delete_user(user_id)

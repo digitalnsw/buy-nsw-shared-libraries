@@ -17,7 +17,7 @@ module SharedResources
     end
 
     def self.single_seller(seller_id)
-      get "#{seller_id}"
+      find seller_id
     end
 
     def self.assign_user(seller_id, user_id, user_email)
