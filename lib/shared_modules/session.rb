@@ -19,7 +19,7 @@ module SharedModules
             uuid: session_user.uuid,
             email: session_user.email,
             name: session_user.full_name
-          } : {}
+          }.select{|k,v|v} : {}
           enc = encrypt data
           cookies[ck] = {
             value: enc,

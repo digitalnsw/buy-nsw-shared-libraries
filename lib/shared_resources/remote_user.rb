@@ -4,8 +4,8 @@ module SharedResources
     self.element_name = "user"
     self.generate_token
 
-    def self.update_seller(user_id, seller_id)
-      post "#{user_id}/update_seller", { seller_id: seller_id }
+    def self.add_to_team(user_id, seller_id)
+      post "#{user_id}/add_to_team", { seller_id: seller_id }
     end
 
     def self.get_team(seller_id)
