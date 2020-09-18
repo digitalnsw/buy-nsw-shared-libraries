@@ -12,6 +12,10 @@ module SharedResources
       find(:all, from: :seller_team, params: { seller_id: seller_id })
     end
 
+    def self.get_owners(seller_id)
+      find(:all, from: :seller_owners, params: { seller_id: seller_id })
+    end
+
     def self.get_by_id(user_id)
       find(:one, from: :get_by_id, params: { id: user_id })
     end
