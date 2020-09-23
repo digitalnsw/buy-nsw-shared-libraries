@@ -122,6 +122,7 @@ module SharedModules
       end
     end
 
+    # TODO: This is not in use right now, but add nounce check if exposed to a third party
     def authenticate_jwt
       token = request.headers['Authorization'].partition('Bearer ').last
       decoded = JWT.decode(token, ENV['JWT_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
@@ -135,8 +136,6 @@ module SharedModules
     def authenticate_service
       token = request.headers['Authentication'].partition('Token ').last
       decoded = JWT.decode(token, ENV['SERVICE_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
-      # FIXME: this check is disabled due to active resource problem of not generating header on every request
-      # raise "Authentication failed" unless (Time.now.to_i - decoded['timestamp'].to_i).abs < 100
       @service_auth = true
       @service_user = decoded['user'] && SessionUser.new(decoded['user'])
     rescue

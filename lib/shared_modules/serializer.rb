@@ -7,8 +7,7 @@ module SharedModules
     def escape_recursive input
       if input.is_a? String
         CGI.unescapeHTML input
-        # FIXME: The second code is correct. But since ember escapes, it was causing issues
-        # html_escape_once input
+        # TODO: html_escape_once input if exposed to third part that doesnt escape
       elsif input.is_a? Array
         input.map{|e| escape_recursive(e)}
       elsif input.is_a? Hash

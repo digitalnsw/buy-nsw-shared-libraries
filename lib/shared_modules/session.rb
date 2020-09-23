@@ -76,9 +76,8 @@ module SharedModules
           end
         end
 
-        # FIXME The following is added to fix a bug and report every time it heppenes.
-        # by adding the concurrent session, this shouldn't happen any more!
-        # remove this check when the Airbrake erorr is gone
+        # TODO The following is added to report every time session is out of syn
+        # This will not be needed any more after dropping devise completely
         if current_user&.id != @session_user&.id ||
            current_user&.uuid != @session_user&.uuid ||
            current_user&.email != @session_user&.email ||
