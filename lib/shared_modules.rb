@@ -1,6 +1,7 @@
 module SharedModules
   require 'shared_modules/encrypt'
   require 'shared_modules/session'
+  require 'shared_modules/abr'
   require 'shared_modules/authentication'
   require 'shared_modules/serializer'
   require 'shared_modules/session_user'
