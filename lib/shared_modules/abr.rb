@@ -21,6 +21,10 @@ module SharedModules
       end
     end
 
+    def self.active?
+      ENV['ABR_GUID'].present?
+    end
+
     private
 
     def self.redis
