@@ -6,7 +6,7 @@ module SharedModules
         key = 'abr_abn_' + abn
         result = redis.get(key)
         return nil if result == 'NOT_FOUND'
-        return JSON.parse(result) if result
+        return JSON.parse(result).symbolize_keys if result
         client = Abn::Client.new(ENV['ABR_GUID'])
         result = client.search(abn)
         if result[:status] || result[:abn]
