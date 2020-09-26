@@ -122,12 +122,21 @@ module SharedModules
       end
     end
 
-    # TODO: This is not in use right now, but add nounce check if exposed to a third party
     def authenticate_jwt
       token = request.headers['Authorization'].partition('Bearer ').last
       decoded = JWT.decode(token, ENV['JWT_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
-      if Time.now.to_i < decoded['IAT'] || Time.now.to_i > decoded['EXP']
+      if Time.now.to_i < decoded['IAT'] || Time.now.to_i >= decoded['EXP'] ||
+          decoded['EXP'] - decoded['IAT'] > 300
         render_authentication_failed
+      end
+      nonce = decoded['NONCE']
+      raise "Invalid nonce" unless nonce.match?(/\A[a-zA-Z0-9]{10,30}\Z/)
+      key = 'NONCE_' + nonce
+      if redis.get key
+        render_authentication_failed
+      else
+        redis.set key, "CONSUMED"
+        redis.expire key, 300
       end
     rescue
       render_authentication_failed
@@ -155,6 +164,12 @@ module SharedModules
     def authenticate_user
       return if current_user.present?
       render_authentication_failed
+    end
+
+    private
+
+    def redis
+      Rails.cache.redis
     end
   end
 end
