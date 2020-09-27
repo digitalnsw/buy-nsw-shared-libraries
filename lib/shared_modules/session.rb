@@ -44,10 +44,11 @@ module SharedModules
 
       def reset_session_user user
         return @session_user = nil unless user.present?
+        # This will not be needed any more after dropping devise completely
         my_buyer = user.is_buyer? &&
-          SharedResources::RemoteBuyer.my_buyer(user) || nil
+          BuyerApplication.find_by(user_id: user.id) || nil
         my_seller = user.seller_id &&
-          SharedResources::RemoteSeller.find(user.seller_id) || nil
+          Seller.find_by(id: user.seller_id) || nil
 
         user_hash = {
           id: user.id,
@@ -76,7 +77,6 @@ module SharedModules
           end
         end
 
-        # TODO The following is added to report every time session is out of syn
         # This will not be needed any more after dropping devise completely
         if current_user&.id != @session_user&.id ||
            current_user&.uuid != @session_user&.uuid ||
@@ -84,22 +84,6 @@ module SharedModules
            current_user&.seller_id != @session_user&.seller_id ||
            current_user&.seller_ids != @session_user&.seller_ids ||
            current_user&.permissions != @session_user&.permissions
-          if Rails.env.production?
-            begin
-              raise nil
-            rescue => e
-              trace = e.backtrace.select{|l|l.match?(/buy-nsw/)}
-            end
-            Airbrake.notify_sync(
-              "Session user is out of sync",
-              {
-                current_user_id: current_user&.id,
-                session_user_id: @session_user&.id,
-                request_path: request.path,
-                trace: trace
-              }
-            )
-          end
           reset_session_user(current_user)
         end
 

@@ -4,19 +4,15 @@ require 'active_resource'
 
 module SharedResources
   class ApplicationResource < ::ActiveResource::Base
-    def self.root_url
-      "http#{ENV['EMAIL_URL_PORT'].to_i==443?'s':''}://#{ENV['EMAIL_URL_HOST']}:#{ENV['EMAIL_URL_PORT']}/"
-    end
-
-    self.site = self.root_url + 'api'
-    self.connection.auth_type = :bearer
-    self.connection.bearer_token = -> { self.bearer_token }
-
-    def self.generate_token(user=nil)
+    def self.generate_token user
       @user = user
     end
 
     protected
+
+    def self.root_url
+      "http#{ENV['EMAIL_URL_PORT'].to_i==443?'s':''}://#{ENV['EMAIL_URL_HOST']}:#{ENV['EMAIL_URL_PORT']}/"
+    end
 
     def self.bearer_token
       user = @user
