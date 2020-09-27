@@ -2,7 +2,9 @@ module SharedResources
   class RemoteEvent < ApplicationResource
     self.site = self.root_url + 'api/events/'
     self.element_name = "event"
-    self.generate_token
+    self.connection.auth_type = :bearer
+    self.connection.bearer_token = -> { self.bearer_token }
+
 
     def self.get_events(eventable_id, eventable_type)
       RemoteEvent.find(:all, params: {eventable_id: eventable_id, eventable_type: eventable_type})

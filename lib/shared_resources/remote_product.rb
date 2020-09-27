@@ -2,7 +2,8 @@ module SharedResources
   class RemoteProduct < ApplicationResource
     self.site = self.root_url + 'api/products/'
     self.element_name = "product"
-    self.generate_token
+    self.connection.auth_type = :bearer
+    self.connection.bearer_token = -> { self.bearer_token }
 
     def self.assign_user(product_id, user_id, user_email)
       post "#{product_id}/assign", { assignee: {id: user_id, email: user_email}}

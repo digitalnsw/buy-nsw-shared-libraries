@@ -2,7 +2,9 @@ module SharedResources
   class RemoteUser < ApplicationResource
     self.site = self.root_url + 'api/users/'
     self.element_name = "user"
-    self.generate_token
+    self.connection.auth_type = :bearer
+    self.connection.bearer_token = -> { self.bearer_token }
+
 
     def self.add_to_team(user_id, seller_id)
       post "#{user_id}/add_to_team", { seller_id: seller_id }

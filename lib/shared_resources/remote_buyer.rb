@@ -2,7 +2,8 @@ module SharedResources
   class RemoteBuyer < ApplicationResource
     self.site = self.root_url + 'api/buyers/'
     self.element_name = "buyer"
-    self.generate_token
+    self.connection.auth_type = :bearer
+    self.connection.bearer_token = -> { self.bearer_token }
 
     def self.manager_approval(token)
       post :approve_buyer, {manager_approval_token: token}

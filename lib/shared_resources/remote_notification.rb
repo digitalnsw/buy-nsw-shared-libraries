@@ -2,7 +2,9 @@ module SharedResources
   class RemoteNotification < ApplicationResource
     self.site = self.root_url + 'api/notifications/'
     self.element_name = "notification"
-    self.generate_token
+    self.connection.auth_type = :bearer
+    self.connection.bearer_token = -> { self.bearer_token }
+
 
     def self.pending_notification?(unifier:)
       find(unifier).present?

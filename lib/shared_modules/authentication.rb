@@ -122,29 +122,18 @@ module SharedModules
       end
     end
 
+    # For external consumers
     def authenticate_jwt
-      token = request.headers['Authorization'].partition('Bearer ').last
-      decoded = JWT.decode(token, ENV['JWT_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
-      if Time.now.to_i < decoded['IAT'] || Time.now.to_i >= decoded['EXP'] ||
-          decoded['EXP'] - decoded['IAT'] > 300
-        render_authentication_failed
-      end
-      nonce = decoded['NONCE']
-      raise "Invalid nonce" unless nonce.match?(/\A[a-zA-Z0-9]{10,30}\Z/)
-      key = 'NONCE_' + nonce
-      if redis.get key
-        render_authentication_failed
-      else
-        redis.set key, "CONSUMED"
-        redis.expire key, 300
-      end
+      decoded = JWT.decode(get_token, ENV['JWT_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
+      check_token decoded['timestamp'], decoded['nonce']
     rescue
       render_authentication_failed
     end
 
+    # Only for internal web service calls
     def authenticate_service
-      token = request.headers['Authentication'].partition('Token ').last
-      decoded = JWT.decode(token, ENV['SERVICE_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
+      decoded = JWT.decode(get_token, ENV['SERVICE_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
+      check_token decoded['timestamp'], decoded['nonce']
       @service_auth = true
       @service_user = decoded['user'] && SessionUser.new(decoded['user'])
     rescue
@@ -167,6 +156,30 @@ module SharedModules
     end
 
     private
+
+    def get_token
+      request.headers['Authorization'].partition('Bearer ').last
+    end
+
+    def check_token timestamp, nonce
+      timestamp = timestamp.to_i
+      if Time.now.to_i < timestamp || Time.now.to_i >= timestamp + 30
+        return render_authentication_failed
+      end
+
+      raise "Invalid nonce" unless nonce.match?(/\A[a-zA-Z0-9]{10}\Z/)
+
+      key = 'NONCE_' + nonce
+      if redis.get key
+        return render_authentication_failed
+      else
+        redis.set key, "CONSUMED"
+        redis.expire key, 30
+      end
+    end
+
+    def check_nonce nonce
+    end
 
     def redis
       Rails.cache.redis

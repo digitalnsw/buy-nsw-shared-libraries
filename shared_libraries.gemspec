@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.require_path = ['lib']
   s.license       = 'MIT'
 
-  s.add_dependency "activeresource", "~> 5.1.0"
+  s.add_dependency "activeresource", "~> 5.1.1"
   s.add_dependency "jwt"
 end
