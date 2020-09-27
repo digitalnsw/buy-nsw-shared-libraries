@@ -60,8 +60,8 @@ module SharedModules
           roles: user.roles.to_a,
           permissions: user.permissions,
           buyer_id: my_buyer&.id,
-          seller_status: my_seller&.status,
-          buyer_status: my_buyer&.state,
+          seller_status: my_seller&.status.to_s,
+          buyer_status: my_buyer&.state.to_s,
         }
 
         update_c_session({user: user_hash})
