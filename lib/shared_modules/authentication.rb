@@ -170,10 +170,9 @@ module SharedModules
       raise "Invalid nonce" unless nonce.match?(/\A[a-zA-Z0-9]{10}\Z/)
 
       key = 'NONCE_' + nonce
-      if redis.get key
+      if redis.getset key, "CONSUMED"
         return render_authentication_failed
       else
-        redis.set key, "CONSUMED"
         redis.expire key, 30
       end
     end
