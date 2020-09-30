@@ -16,7 +16,7 @@ module SharedResources
       create(unifier: unifier, recipients: recipients, subject: subject, body: body, fa_icon: fa_icon, actions: actions)
     rescue ActiveResource::ClientError => e
       if e.message.match?(/\b406\b/)
-        raise SharedModules::AlertError.new('Request canceled! A duplicate request is pendinding in the queue.')
+        raise SharedModules::AlertError.new('Request canceled! A duplicate request is pending in the queue.')
       else
         raise e.message
       end

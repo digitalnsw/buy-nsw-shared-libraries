@@ -9,6 +9,10 @@ module SharedResources
       post :approve_buyer, {manager_approval_token: token}
     end
 
+    def self.check_email(email)
+      get(:check_email, { email: email })['valid']
+    end
+
     def can_buy?
       self.state == 'approved'
     end
