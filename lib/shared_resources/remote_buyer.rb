@@ -13,6 +13,10 @@ module SharedResources
       get(:check_email, { email: email })['valid']
     end
 
+    def self.auto_register(email:, user_id:, name:)
+      post(:auto_register, { email: email, user_id: user_id, name: name })
+    end
+
     def can_buy?
       self.state == 'approved'
     end
