@@ -6,8 +6,8 @@ module SharedResources
     self.connection.bearer_token = -> { self.bearer_token }
 
 
-    def self.add_to_team(user_id, seller_id)
-      post "#{user_id}/add_to_team", { seller_id: seller_id }
+    def self.add_to_team(user_id, seller_id, privileges = [])
+      post "#{user_id}/add_to_team", { seller_id: seller_id, privileges: privileges }
     end
 
     def self.get_team(seller_id)
