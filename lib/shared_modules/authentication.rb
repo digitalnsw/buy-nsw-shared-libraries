@@ -17,7 +17,6 @@ module SharedModules
     include ERB::Util
 
     included do
-      before_action :set_headers
       protect_from_forgery with: :exception unless Rails.env.test?
       impersonates :user
 
@@ -106,13 +105,6 @@ module SharedModules
 
     def service_user
       @service_user
-    end
-
-    def set_headers
-      response.headers["Expires"] = '0'
-      response.headers["Pragma"] = 'no-cache'
-      response.headers["Cache-Control"] = "private, no-cache, no-store, must-revalidate, max-age=0, s-maxage=0"
-      response.headers["Last-Modified"] = Time.now.strftime("%a, %d %b %Y %T %Z")
     end
 
     def authenticate_basic
