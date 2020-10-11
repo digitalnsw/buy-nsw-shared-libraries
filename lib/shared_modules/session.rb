@@ -15,14 +15,14 @@ module SharedModules
         ck = ENV['SSO_SYNC_COOKIE']
         if ck.present?
           data = session_user.present? ? {
-            equaliser: '',
+            e: '',
             id: session_user.id,
             uuid: session_user.uuid,
             email: session_user.email,
             name: session_user.full_name
-          }.select{|k,v|v} : { equaliser: '' }
-          length = [128 - data.to_json.length, 16].max
-          data[:equaliser] = SecureRandom.base58(length)
+          }.select{|k,v|v} : { e: '' }
+          length = [64 - data.to_json.length, 16].max
+          data[:e] = SecureRandom.base58(length)
           
           enc = encrypt data
           cookies[ck] = {
