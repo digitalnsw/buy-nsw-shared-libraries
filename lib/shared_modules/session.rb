@@ -21,7 +21,7 @@ module SharedModules
             email: session_user.email,
             name: session_user.full_name
           }.select{|k,v|v} : { e: '' }
-          length = [64 - data.to_json.length, 16].max
+          length = [192 - data.to_json.length, 16].max
           data[:e] = SecureRandom.base58(length)
           
           enc = encrypt data
