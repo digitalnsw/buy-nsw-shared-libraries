@@ -21,7 +21,7 @@ module SharedModules
             email: session_user.email,
             name: session_user.full_name
           }.select{|k,v|v} : { equaliser: '' }
-          length = [128 - data.to_json.length, 16]
+          length = [128 - data.to_json.length, 16].max
           data[:equaliser] = SecureRandom.base58(length)
           
           enc = encrypt data
