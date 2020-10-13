@@ -118,7 +118,7 @@ module SharedModules
     def authenticate_jwt
       decoded = JWT.decode(get_token, ENV['JWT_AUTH_SECRET'], true, { algorithm: 'HS256' }).first
       check_token decoded['timestamp'], decoded['nonce']
-    rescue
+    rescue JWT::DecodeError
       render_authentication_failed
     end
 
@@ -128,7 +128,7 @@ module SharedModules
       check_token decoded['timestamp'], decoded['nonce']
       @service_auth = true
       @service_user = decoded['user'] && SessionUser.new(decoded['user'])
-    rescue
+    rescue JWT::DecodeError
       render_authentication_failed
     end
 
