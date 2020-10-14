@@ -24,7 +24,7 @@ module SharedModules
           length = [192 - data.to_json.length, 16].max
           data[:e] = SecureRandom.base58(length)
           
-          enc = aes data
+          enc = aes data.to_json
           cookies[ck] = {
             value: enc,
             expires: 2.weeks.from_now,

@@ -28,7 +28,7 @@ module SharedModules
       cipher = OpenSSL::Cipher::AES128.new(:CBC).encrypt
       cipher.key = Base64.decode64(ENV['ETENDERING_ENCRYPTION_KEY'])
       iv = cipher.random_iv
-      enc = cipher.update(data.to_json) << cipher.final
+      enc = cipher.update(data) << cipher.final
       bin2hex(iv) + bin2hex(enc)
     end
   end
