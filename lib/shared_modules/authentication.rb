@@ -150,7 +150,7 @@ module SharedModules
     private
 
     def get_token
-      request.headers['Authorization'].partition('Bearer ').last
+      request.headers['Authorization']&.partition('Bearer ')&.last
     end
 
     def check_token timestamp, nonce
