@@ -11,7 +11,8 @@ module SharedResources
     protected
 
     def self.root_url
-      "http#{ENV['EMAIL_URL_PORT'].to_i==443?'s':''}://#{ENV['EMAIL_URL_HOST']}:#{ENV['EMAIL_URL_PORT']}/"
+      port_str = ENV['EMAIL_URL_PORT'].to_i.in?([80,443]) ? '' : ( ':' + ENV['EMAIL_URL_PORT'].to_s )
+      "http#{ENV['EMAIL_URL_PORT'].to_i==443?'s':''}://#{ENV['EMAIL_URL_HOST']}#{port_str}/"
     end
 
     def self.bearer_token
