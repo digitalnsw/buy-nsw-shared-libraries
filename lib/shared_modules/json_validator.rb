@@ -46,7 +46,7 @@ module SharedModules
         elsif pattern == 'string'
           "String expected" unless value.is_a? String
         elsif pattern == 'limited'
-          "Invalid format" unless value.is_a?(String) && /\A[A-Za-z0-9 .,'":+~*\-_|()@#$\/]{0,100}\z/ =~ value
+          "Invalid format" unless value.is_a?(String) && /\A[A-Za-z0-9 .,'":;+~*\-_|()@#$%&\/]{0,100}\z/ =~ value
         elsif pattern == 'name'
           "Invalid name" unless value.is_a?(String) && /\A[A-Za-z .'\-]{0,100}\z/ =~ value
         elsif pattern == 'phone'
@@ -54,7 +54,7 @@ module SharedModules
         elsif pattern == 'email'
           "Email address expected" unless value.is_a?(String) && URI::MailTo::EMAIL_REGEXP =~ value
         elsif pattern == 'text'
-          "Invalid format" unless value.is_a?(String) && /\A[A-Za-z0-9 .,'":+~*\-_|()@#$\/\s]{0,1000}\z/ =~ value
+          "Invalid format" unless value.is_a?(String) && /\A[A-Za-z0-9 .,'":;+~*\-_|()@#$%&\/\s]{0,1000}\z/ =~ value
         else
           "Not implemented"
         end
