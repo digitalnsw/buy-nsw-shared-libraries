@@ -36,7 +36,7 @@ module SharedModules
     def render_alert(error)
       render json: {
         errors: [{ alert: error.message }]
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_entity #422
     end
 
     def render_authentication_failed
