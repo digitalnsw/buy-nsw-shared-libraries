@@ -4,14 +4,14 @@ module SharedModules
   module Serializer
     include ERB::Util
 
-    BCREG = /[^A-Za-z0-9 .,'":;?~!@#$%^&*()-_+=\[\]\|\/\s]/
+    BCREG = /[^A-Za-z0-9 .,'":;?~!@#$%^&*()\-_+=\{\}\[\]\|\/\s]/
 
     def sanitize s
       s.gsub(Serializer::BCREG, '?')
     end
 
     def full_sanitize s
-      ActionView::Base.full_sanitizer.sanitize(unescape s, tags: [])
+      unescape(ActionView::Base.full_sanitizer.sanitize(unescape(s), tags: []))
     end
 
     def escape s
