@@ -30,8 +30,8 @@ module SharedResources
       delete user_id
     end
 
-    def self.remove_from_supplier(user_id)
-      post "#{user_id}/remove_from_supplier"
+    def self.remove_from_supplier(user_id, seller_id)
+      post "#{user_id}/remove_from_supplier", { seller_id: seller_id }
     end
   end
 end 
