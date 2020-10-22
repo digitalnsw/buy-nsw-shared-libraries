@@ -155,7 +155,7 @@ module SharedModules
 
     def check_token timestamp, nonce
       timestamp = timestamp.to_i
-      if Time.now.to_i < timestamp || Time.now.to_i >= timestamp + 30
+      if Time.now.to_i < timestamp - 300 || Time.now.to_i >= timestamp + 300
         return render_authentication_failed
       end
 
@@ -165,7 +165,7 @@ module SharedModules
       if redis.getset key, "CONSUMED"
         return render_authentication_failed
       else
-        redis.expire key, 30
+        redis.expire key, 600
       end
     end
 
