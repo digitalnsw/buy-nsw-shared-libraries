@@ -1,10 +1,16 @@
 module SharedModules
+  class RetryError < RuntimeError; end
+
   class ApplicationJob < ActiveJob::Base
     # At the moment everything gets queued in the same queue
     queue_as ENV.fetch('MAILER_QUEUE_NAME', :default)
 
     rescue_from Exception do |exception|
-      Airbrake.notify_sync exception
+      if exception.is_a? RetryError
+        raise exception
+      else
+        Airbrake.notify_sync exception
+      end
     end
 
     protected
