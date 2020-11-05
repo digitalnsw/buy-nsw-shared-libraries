@@ -6,11 +6,11 @@ module SharedModules
         key = 'abr_abn_' + abn
         result = redis.get(key)
         return nil if result == 'NOT_FOUND'
-        return JSON.parse(result).symbolize_keys if result
+        return Marshal.load(result) if result
         client = Abn::Client.new(ENV['ABR_GUID'])
         result = client.search(abn)
         if result[:status] || result[:abn]
-          redis.set key, result.to_json
+          redis.set key, Marshal.dump(result)
           redis.expire key, 14.day.to_i
           return result
         else
@@ -44,7 +44,7 @@ module SharedModules
           date: DateTime.now.to_s,
           history: 'N'
         }
-      })
+      }).body[:identifier_search_response][:abr_payload_search_identifier]
     rescue => e
       puts e.message
       Airbrake.notify_sync(e.message, {
@@ -60,10 +60,10 @@ module SharedModules
         key = 'abr_search_' + abn
         result = redis.get(key)
         return nil if result == 'NOT_FOUND'
-        return JSON.parse(result).symbolize_keys if result
+        return Marshal.load(result) if result
         result = search_call(abn)
         if result.present?
-          redis.set key, result.to_json
+          redis.set key, Marshal.dump(result)
           redis.expire key, 14.day.to_i
           return result
         else
