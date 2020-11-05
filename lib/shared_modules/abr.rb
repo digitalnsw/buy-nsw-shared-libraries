@@ -21,6 +21,59 @@ module SharedModules
       end
     end
 
+    WSDL_URL = ENV['ABR_SEARCH_ENDPOINT'] + '?WSDL'
+
+    def self.search_call abn
+      client = Savon.client do |globals|
+        globals.wsdl WSDL_URL
+        globals.open_timeout 15
+        globals.read_timeout 15
+        globals.ssl_version :TLSv1_2
+        globals.soap_version 2
+        globals.namespace_identifier :abr
+        globals.env_namespace :soap
+        globals.endpoint ENV['ABR_SEARCH_ENDPOINT']
+        globals.pretty_print_xml true
+        globals.basic_auth [ENV['ABR_SEARCH_USERNAME'],ENV['ABR_SEARCH_PASSWORD']]
+      end
+
+      client.call(:identifier_search, message: {
+        search_identifier: {
+          identifier_type: 'ABN',
+          identifier_value: abn,
+          date: DateTime.now.to_s,
+          history: 'N'
+        }
+      })
+    rescue => e
+      puts e.message
+      Airbrake.notify_sync(e.message, {
+        abn: abn,
+        trace: e.backtrace.select{|l|l.match?(/buy-nsw/)},
+      })
+      nil
+    end
+
+    def self.search abn
+      if ABN.valid? abn
+        abn = ABN.new(abn).to_s.gsub(' ', '')
+        key = 'abr_search_' + abn
+        result = redis.get(key)
+        return nil if result == 'NOT_FOUND'
+        return JSON.parse(result).symbolize_keys if result
+        result = search_call(abn)
+        if result.present?
+          redis.set key, result.to_json
+          redis.expire key, 14.day.to_i
+          return result
+        else
+          redis.set key, "NOT_FOUND"
+          redis.expire key, 14.day.to_i
+          return nil
+        end
+      end
+    end
+
     def self.active?
       ENV['ABR_GUID'].present?
     end
