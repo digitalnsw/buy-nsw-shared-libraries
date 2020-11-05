@@ -21,7 +21,7 @@ module SharedModules
       end
     end
 
-    WSDL_URL = ENV['ABR_SEARCH_ENDPOINT'] + '?WSDL'
+    WSDL_URL = ENV['ABR_SEARCH_ENDPOINT'].to_s + '?WSDL'
 
     def self.search_call abn
       client = Savon.client do |globals|
