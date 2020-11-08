@@ -6,8 +6,12 @@ module SharedResources
     self.connection.bearer_token = -> { self.bearer_token }
 
 
-    def self.add_to_team(user_id, seller_id, privileges = [])
-      post "#{user_id}/add_to_team", { seller_id: seller_id, privileges: privileges }
+    def self.add_to_team(user_id, seller_id, privileges = [], abn = nil)
+      post "#{user_id}/add_to_team", { seller_id: seller_id, privileges: privileges, abn: abn }
+    end
+
+    def self.request_declined(user_id, abn)
+      post "#{user_id}/request_declined", { abn: abn }
     end
 
     def self.get_team(seller_id)
