@@ -32,5 +32,13 @@ module SharedResources
     def self.decline(seller_id, field_statuses, response)
       post "#{seller_id}/decline", { field_statuses: field_statuses, response: response}
     end
+
+    def self.activate(seller_id, response)
+      post "#{seller_id}/activate", { response: response }
+    end
+
+    def self.deactivate(seller_id, response)
+      post "#{seller_id}/deactivate", { response: response }
+    end
   end
 end
