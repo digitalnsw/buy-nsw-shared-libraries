@@ -11,11 +11,11 @@ module SharedModules
         result = client.search(abn)
         if result[:status] || result[:abn]
           redis.set key, result.to_json
-          redis.expire key, 14.day.to_i
+          redis.expire key, 7.day.to_i
           return result
         else
           redis.set key, "NOT_FOUND"
-          redis.expire key, 14.day.to_i
+          redis.expire key, 7.day.to_i
           return nil
         end
       end
@@ -64,11 +64,11 @@ module SharedModules
         result = search_call(abn)
         if result.present?
           redis.set key, Marshal.dump(result)
-          redis.expire key, 14.day.to_i
+          redis.expire key, 7.day.to_i
           return result
         else
           redis.set key, "NOT_FOUND"
-          redis.expire key, 14.day.to_i
+          redis.expire key, 7.day.to_i
           return nil
         end
       end
