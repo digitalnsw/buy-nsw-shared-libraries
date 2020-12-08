@@ -12,6 +12,10 @@ module SharedResources
       false
     end
 
+    def self.discard notification_id
+      delete notification_id
+    end
+
     def self.create_notification(recipients:, subject:, body:, fa_icon: nil, actions: [], unifier: nil)
       create(unifier: unifier, recipients: recipients, subject: subject, body: body, fa_icon: fa_icon, actions: actions)
     rescue ActiveResource::ClientError => e
