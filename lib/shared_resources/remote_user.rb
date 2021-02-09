@@ -37,5 +37,9 @@ module SharedResources
     def self.remove_from_supplier(user_id, seller_id)
       post "#{user_id}/remove_from_supplier", { seller_id: seller_id }
     end
+
+    def self.reset_user(user_id)
+      post "#{user_id}/reset_user"
+    end
   end
 end 
